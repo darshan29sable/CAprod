@@ -115,6 +115,25 @@ app.get('/config.js',(req,res)=>{
 
 });
 
+// ---------------- CONTENT JS SERVING ----------------
+
+app.get('/content.js',(req,res)=>{
+
+    try{
+
+        const content = fs.readFileSync(CONTENT_PATH,'utf8');
+        res.setHeader('Content-Type','application/javascript');
+        res.setHeader('Cache-Control','no-cache');
+        res.send(content);
+
+    } catch{
+
+        res.status(500).send("Error reading content");
+
+    }
+
+});
+
 // ---------------- LOGIN API ----------------
 
 app.post('/api/login',(req,res)=>{
@@ -289,11 +308,12 @@ function getFullContent(){
 
         const content = fs.readFileSync(CONTENT_PATH,'utf8');
 
-        const freeRes = content.match(/const\s+FREE_RESOURCES\s*=\s*([\s\S]*?);/);
-        const exclRes = content.match(/const\s+EXCLUSIVE_RESOURCES\s*=\s*([\s\S]*?);/);
-        const videos = content.match(/const\s+youtubeVideos\s*=\s*([\s\S]*?);/);
+        const freeRes = content.match(/const\s+FREE_RESOURCES\s*=\s*(\[[\s\S]*?\]);/);
+        const exclRes = content.match(/const\s+EXCLUSIVE_RESOURCES\s*=\s*(\[[\s\S]*?\]);/);
+        const videos = content.match(/const\s+youtubeVideos\s*=\s*(\[[\s\S]*?\]);/);
 
         if(!freeRes || !exclRes || !videos){
+            console.log("Regex match failed for content components");
             return null;
         }
 
@@ -301,9 +321,7 @@ function getFullContent(){
             .replace(/\/\*[\s\S]*?\*\//g,'')
             .replace(/\/\/.*$/gm,'')
             .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g,'$1"$2":')
-            .replace(/:\s*'/g,': "')
-            .replace(/'\s*,/g,'",')
-            .replace(/'\s*\]/g,'"]')
+            .replace(/:\s*'([^']*)'/g,': "$1"') // Fix single quotes to double
             .replace(/,\s*}/g,'}')
             .replace(/,\s*\]/g,']');
 
@@ -366,7 +384,9 @@ app.use(express.static(__dirname));
 
 app.get('*',(req,res,next)=>{
 
-    if(!req.url.startsWith('/api/') && req.url !== '/config.js'){
+    // Only fallback for non-file requests (no dot in the last segment of the path)
+    const base = path.basename(req.url);
+    if(!req.url.startsWith('/api/') && req.url !== '/config.js' && req.url !== '/content.js' && !base.includes('.')){
 
         res.sendFile(path.join(__dirname,'index.html'));
 
