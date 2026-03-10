@@ -14,6 +14,15 @@ const CONTENT_PATH = path.join(__dirname, 'content.js');
 app.use(cors());
 app.use(express.json());
 
+// Block access to sensitive files
+app.use((req, res, next) => {
+    const forbidden = ['server.js', 'package.json', 'package-lock.json', 'render.yaml', 'Procfile', '.gitignore', 'vercel.json', 'vecel.json', 'server.py'];
+    if (forbidden.some(f => req.url.includes(f))) {
+        return res.status(403).send('Access Denied');
+    }
+    next();
+});
+
 // ---------------- CONFIG HELPERS ----------------
 
 function getFullConfig() {
@@ -261,6 +270,17 @@ app.get('/api/admin/config',adminCheck,(req,res)=>{
 
 });
 
+app.post('/api/admin/save-config', adminCheck, (req, res) => {
+    try {
+        const newConfig = req.body;
+        const configStr = `const CONFIG = ${JSON.stringify(newConfig, null, 4)};`;
+        fs.writeFileSync(CONFIG_PATH, configStr, 'utf8');
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 // ---------------- CONTENT MANAGEMENT ----------------
 
 function getFullContent(){
@@ -315,6 +335,29 @@ app.get('/api/admin/content',adminCheck,(req,res)=>{
         res.status(500).json({success:false});
     }
 
+});
+
+app.post('/api/admin/save-content', adminCheck, (req, res) => {
+    try {
+        const { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos } = req.body;
+        
+        let contentStr = `
+// Free Learning Resources
+const FREE_RESOURCES = ${JSON.stringify(FREE_RESOURCES, null, 4)};
+
+// Exclusive Community Resources
+const EXCLUSIVE_RESOURCES = ${JSON.stringify(EXCLUSIVE_RESOURCES, null, 4)};
+
+// Combined for easy lookup
+const ALL_RESOURCES = [...FREE_RESOURCES, ...EXCLUSIVE_RESOURCES.map(r => ({ ...r, exclusive: true }))];
+
+const youtubeVideos = ${JSON.stringify(youtubeVideos, null, 4)};
+`;
+        fs.writeFileSync(CONTENT_PATH, contentStr, 'utf8');
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 // ---------------- STATIC FILES ----------------

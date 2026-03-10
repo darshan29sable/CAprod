@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: captain-automation
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3030
+      - key: NODE_ENV
+        value: production
+    # Optional: If you want persistence for config.js and content.js, 
+    # you would need a disk, but that is a paid feature.
+    # disk:
+    #   name: data
+    #   mountPath: /data
+    #   sizeGB: 1
