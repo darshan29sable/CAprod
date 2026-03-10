@@ -25,31 +25,24 @@ app.use((req, res, next) => {
 
 // ---------------- CONFIG HELPERS ----------------
 
-function getFullConfig() {
+// Helper to safely extract a JS variable from a file
+function getJsVar(filePath, varName) {
     try {
-        const content = fs.readFileSync(CONFIG_PATH, 'utf8');
-        const match = content.match(/const\s+CONFIG\s*=\s*(\{[\s\S]*\});?/);
+        const content = fs.readFileSync(filePath, 'utf8');
+        const regex = new RegExp(`const\\s+${varName}\\s*=\\s*([\\s\\S]*?);(\\r?\\n|$)`);
+        const match = content.match(regex);
         if (!match) return null;
-
-        const rawObj = match[1];
-
-        let jsonStr = rawObj
-            .replace(/(\w+):/g, '"$1":')
-            .replace(/,\s*}/g, '}')
-            .replace(/,\s*\]/g, ']')
-            .replace(/\/\/.*$/gm, '');
-
-        try {
-            return JSON.parse(jsonStr);
-        } catch {
-            let configData;
-            eval('configData = ' + rawObj);
-            return configData;
-        }
-
-    } catch {
+        
+        // Use a Function constructor to safely evaluate the JS object/array
+        return new Function(`return ${match[1]}`)();
+    } catch (err) {
+        console.error(`Error parsing ${varName} from ${filePath}:`, err.message);
         return null;
     }
+}
+
+function getFullConfig() {
+    return getJsVar(CONFIG_PATH, 'CONFIG');
 }
 
 function updateConfig(updater) {
@@ -110,25 +103,6 @@ app.get('/config.js',(req,res)=>{
     } catch{
 
         res.status(500).send("Error reading config");
-
-    }
-
-});
-
-// ---------------- CONTENT JS SERVING ----------------
-
-app.get('/content.js',(req,res)=>{
-
-    try{
-
-        const content = fs.readFileSync(CONTENT_PATH,'utf8');
-        res.setHeader('Content-Type','application/javascript');
-        res.setHeader('Cache-Control','no-cache');
-        res.send(content);
-
-    } catch{
-
-        res.status(500).send("Error reading content");
 
     }
 
@@ -303,44 +277,14 @@ app.post('/api/admin/save-config', adminCheck, (req, res) => {
 // ---------------- CONTENT MANAGEMENT ----------------
 
 function getFullContent(){
+    const FREE_RESOURCES = getJsVar(CONTENT_PATH, 'FREE_RESOURCES');
+    const EXCLUSIVE_RESOURCES = getJsVar(CONTENT_PATH, 'EXCLUSIVE_RESOURCES');
+    const youtubeVideos = getJsVar(CONTENT_PATH, 'youtubeVideos');
 
-    try{
-
-        const content = fs.readFileSync(CONTENT_PATH,'utf8');
-
-        const freeRes = content.match(/const\s+FREE_RESOURCES\s*=\s*(\[[\s\S]*?\]);/);
-        const exclRes = content.match(/const\s+EXCLUSIVE_RESOURCES\s*=\s*(\[[\s\S]*?\]);/);
-        const videos = content.match(/const\s+youtubeVideos\s*=\s*(\[[\s\S]*?\]);/);
-
-        if(!freeRes || !exclRes || !videos){
-            console.log("Regex match failed for content components");
-            return null;
-        }
-
-        const clean = str => str
-            .replace(/\/\*[\s\S]*?\*\//g,'')
-            .replace(/\/\/.*$/gm,'')
-            .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g,'$1"$2":')
-            .replace(/:\s*'([^']*)'/g,': "$1"') // Fix single quotes to double
-            .replace(/,\s*}/g,'}')
-            .replace(/,\s*\]/g,']');
-
-        return {
-
-            FREE_RESOURCES: JSON.parse(clean(freeRes[1])),
-            EXCLUSIVE_RESOURCES: JSON.parse(clean(exclRes[1])),
-            youtubeVideos: JSON.parse(clean(videos[1]))
-
-        };
-
-    } catch(e){
-
-        console.log("Content parse error",e.message);
-
-        return null;
-
+    if (FREE_RESOURCES && EXCLUSIVE_RESOURCES && youtubeVideos) {
+        return { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos };
     }
-
+    return null;
 }
 
 app.get('/api/admin/content',adminCheck,(req,res)=>{
@@ -383,19 +327,16 @@ const youtubeVideos = ${JSON.stringify(youtubeVideos, null, 4)};
 app.use(express.static(__dirname));
 
 app.get('*',(req,res,next)=>{
-
-    // Only fallback for non-file requests (no dot in the last segment of the path)
-    const base = path.basename(req.url);
-    if(!req.url.startsWith('/api/') && req.url !== '/config.js' && req.url !== '/content.js' && !base.includes('.')){
-
-        res.sendFile(path.join(__dirname,'index.html'));
-
-    } else {
-
-        next();
-
+    const url = req.url.split('?')[0];
+    const base = path.basename(url);
+    
+    // If it looks like an API call or a specific file, skip the index.html fallback
+    if(url.startsWith('/api/') || url === '/config.js' || url === '/content.js' || base.includes('.')){
+        return next();
     }
-
+    
+    // Otherwise serve index.html for SPA-style routing
+    res.sendFile(path.join(__dirname,'index.html'));
 });
 
 // ---------------- START SERVER ----------------
