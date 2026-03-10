@@ -28,8 +28,56 @@
                 </button>
                 <div class="auth-container" id="auth-container"></div>
             </div>
+            <!-- Hamburger button (mobile only) -->
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
         </nav>
     </header>
+
+    <!-- Mobile Nav Overlay (backdrop) -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+    <!-- Mobile Nav Drawer -->
+    <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Mobile navigation">
+        <a href="index.html" class="drawer-logo">CAPTAIN<span>AUTOMATION</span></a>
+        <button class="drawer-close" id="drawer-close-btn" aria-label="Close menu">
+            <i data-lucide="x"></i>
+        </button>
+
+        <!-- User card injected by JS -->
+        <div id="drawer-user-card"></div>
+        <div class="drawer-section-label">Navigation</div>
+        <a href="index.html" class="drawer-link active">
+            <i data-lucide="home"></i> Home
+        </a>
+        <a href="about.html" class="drawer-link">
+            <i data-lucide="user"></i> About Me
+        </a>
+        <a href="resources.html" class="drawer-link">
+            <i data-lucide="book-open"></i> Resources
+        </a>
+        <a href="youtube.html" class="drawer-link">
+            <i data-lucide="youtube"></i> YouTube
+        </a>
+        <a href="mock-test.html" class="drawer-link">
+            <i data-lucide="clipboard-list"></i> Mock Test
+        </a>
+
+        <div class="drawer-divider"></div>
+        <a href="fam.html" class="drawer-cta">
+            <i data-lucide="users"></i> Join CA Community
+        </a>
+
+        <div class="drawer-bottom" style="margin-top: auto;">
+            <span>Toggle Theme</span>
+            <button class="drawer-theme-btn" id="drawer-theme-btn" aria-label="Toggle theme">
+                <i data-lucide="moon"></i>
+            </button>
+        </div>
+    </nav>
 
     <main>
         <section class="hero-split" id="hero-section">
@@ -97,9 +145,25 @@
                 <h2>The <span class="highlight">Genuinenity</span> Behind the Brand</h2>
                 <p>Real feedback from learners who transformed their careers with the Captain.</p>
             </div>
-            <div class="testimonial-slider" id="testimonial-container">
-                <!-- Testimonials will be rendered here from main.js -->
+
+            <!-- Carousel: prev btn | slider viewport | next btn -->
+            <div class="testimonial-carousel">
+                <button class="tcarousel-btn" id="tcarousel-prev" aria-label="Previous testimonial">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+
+                <div class="testimonial-slider">
+                    <!-- Inner track — cards appended here by main.js -->
+                    <div class="testimonial-track" id="testimonial-container"></div>
+                </div>
+
+                <button class="tcarousel-btn" id="tcarousel-next" aria-label="Next testimonial">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
+
+            <!-- Dot indicators -->
+            <div class="tcarousel-dots" id="tcarousel-dots"></div>
         </section>
     </main>
 
@@ -119,5 +183,67 @@
     <script src="config.js"></script>
     <script src="content.js"></script>
     <script src="main.js"></script>
+    <script>
+        // ── Hamburger / Mobile Drawer ──────────────────────────────
+        (function() {
+            function initDrawer() {
+                const btn      = document.getElementById('hamburger-btn');
+                const drawer   = document.getElementById('mobile-nav-drawer');
+                const overlay  = document.getElementById('mobile-nav-overlay');
+                const closeBtn = document.getElementById('drawer-close-btn');
+                const dTheme   = document.getElementById('drawer-theme-btn');
+
+                if (!btn || !drawer || !overlay) return;
+
+                function renderDrawerUser() {
+                    if (typeof window.drawerRenderUser === 'function') window.drawerRenderUser();
+                }
+
+                function openDrawer() {
+                    drawer.classList.add('open');
+                    overlay.classList.add('open');
+                    btn.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                    document.body.classList.add('nav-open');
+                    renderDrawerUser();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+
+                function closeDrawer() {
+                    drawer.classList.remove('open');
+                    overlay.classList.remove('open');
+                    btn.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                    document.body.classList.remove('nav-open');
+                }
+
+                btn.addEventListener('click', () => {
+                    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+                });
+                overlay.addEventListener('click', closeDrawer);
+                if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+                document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+                // Sync drawer theme button with main theme toggle
+                if (dTheme) {
+                    dTheme.addEventListener('click', () => {
+                        const mainToggle = document.getElementById('theme-toggle');
+                        if (mainToggle) mainToggle.click();
+                        const theme = document.documentElement.getAttribute('data-theme');
+                        const icon = dTheme.querySelector('i,svg');
+                        if (icon && icon.tagName === 'I') icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    });
+                }
+            }
+
+            // Run after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initDrawer);
+            } else {
+                initDrawer();
+            }
+        })();
+    </script>
 </body>
 </html>

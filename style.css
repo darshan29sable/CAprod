@@ -693,29 +693,49 @@ footer {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Testimonials */
+/* Testimonials — Carousel */
 .testimonials {
     padding: 8rem 10%;
     border-top: 1px solid var(--glass-border);
 }
 
-.testimonial-slider {
+/* Outer wrapper that holds arrows + viewport */
+.testimonial-carousel {
+    position: relative;
     display: flex;
-    gap: 2rem;
-    overflow-x: auto;
-    padding: 2rem 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) transparent;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
+/* Clipping viewport */
+.testimonial-slider {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+/* Inner track — slides side by side */
+.testimonial-track {
+    display: flex;
+    gap: 0;
+    width: 100%;              /* crucial: gives 100% a concrete reference for children */
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
+}
+
+/* Each card takes 100% of the viewport */
 .chat-screenshot {
-    min-width: 350px;
-    height: 500px;
+    min-width: 100%;          /* 100% of .testimonial-track (which now has defined width) */
+    width: 100%;
+    height: 520px;
     background: var(--card-bg);
     border-radius: 20px;
     border: 1px solid var(--glass-border);
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .chat-screenshot img {
@@ -735,6 +755,62 @@ footer {
     padding: 3rem;
     text-align: center;
 }
+
+/* Arrow navigation buttons */
+.tcarousel-btn {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s, border-color 0.25s, transform 0.2s;
+    backdrop-filter: blur(10px);
+    z-index: 2;
+}
+
+.tcarousel-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.tcarousel-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Dot indicators */
+.tcarousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.tcarousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--glass-border);
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    padding: 0;
+}
+
+.tcarousel-dot.active {
+    background: var(--primary-color);
+    transform: scale(1.4);
+}
+
 
 .placeholder-chat i {
     margin-bottom: 2rem;
@@ -785,18 +861,439 @@ footer {
     .nav-links a { font-size: 0.75rem; }
 }
 
+/* ========= HAMBURGER MENU ========= */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    z-index: 201;
+    transition: background 0.3s, border-color 0.3s;
+    flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: var(--primary-color);
+}
+
+.hamburger-btn .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-color);
+    border-radius: 2px;
+    transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.25s;
+    transform-origin: center;
+}
+
+.hamburger-btn.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Backdrop overlay — NO backdrop-filter to avoid stacking context conflict */
+.mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.75);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.mobile-nav-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Slide-in mobile drawer */
+.mobile-nav-drawer {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    height: 100% !important;
+    width: min(300px, 85vw) !important;
+    background: var(--card-bg) !important;
+    border-left: 1px solid var(--glass-border) !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* Override global nav {} styles */
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    max-width: none !important;
+    margin: 0 !important;
+    /* Layout */
+    padding: 5rem 1.5rem 2.5rem !important;
+    gap: 0.4rem !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.38s cubic-bezier(0.23, 1, 0.32, 1) !important;
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.mobile-nav-drawer.open {
+    transform: translateX(0) !important;
+}
+
+/* ── Drawer User Profile Card ─────────────────── */
+.drawer-user-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(34,211,238,0.06));
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 14px;
+    margin-bottom: 0.4rem;
+}
+
+.drawer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.drawer-user-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.drawer-user-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.drawer-user-pts {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+}
+
+.drawer-guest-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.25s;
+    margin-bottom: 0.4rem;
+}
+
+.drawer-guest-card:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.drawer-guest-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px dashed var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+
+/* Drawer action buttons (change pass / admin / logout) */
+.drawer-user-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.drawer-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s, color 0.2s;
+    font-family: inherit;
+}
+
+.drawer-action-btn:hover {
+    background: var(--glass-bg);
+    transform: translateX(3px);
+}
+
+.drawer-action-btn svg { flex-shrink: 0; }
+
+.drawer-action-admin {
+    border-color: rgba(99,102,241,0.3) !important;
+    color: var(--primary-color) !important;
+    background: rgba(99,102,241,0.06) !important;
+}
+.drawer-action-admin:hover {
+    background: rgba(99,102,241,0.14) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.drawer-action-logout {
+    border-color: rgba(244,63,94,0.2) !important;
+    color: var(--accent-red) !important;
+    background: rgba(244,63,94,0.04) !important;
+}
+.drawer-action-logout:hover {
+    background: rgba(244,63,94,0.12) !important;
+    border-color: var(--accent-red) !important;
+}
+
+.mobile-nav-drawer .drawer-logo {
+    position: absolute;
+    top: 1.4rem;
+    left: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.mobile-nav-drawer .drawer-logo span {
+    color: var(--primary-color);
+}
+
+.mobile-nav-drawer .drawer-close {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.mobile-nav-drawer .drawer-close:hover {
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+    transform: rotate(90deg);
+}
+
+.drawer-section-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 1rem 0.5rem 0.3rem;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 0.2rem;
+}
+
+.mobile-nav-drawer a.drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    opacity: 1;
+}
+
+.mobile-nav-drawer a.drawer-link:hover {
+    background: var(--glass-bg);
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.mobile-nav-drawer a.drawer-link.active {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+}
+
+.mobile-nav-drawer a.drawer-link svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--primary-color);
+}
+
+.mobile-nav-drawer a.drawer-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 1rem;
+    background: var(--primary-color);
+    color: #fff !important;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    transition: 0.3s;
+    opacity: 1 !important;
+}
+
+.mobile-nav-drawer a.drawer-cta:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.drawer-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 0.6rem 0;
+}
+
+.drawer-bottom {
+    margin-top: auto;
+    padding-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.drawer-theme-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.drawer-theme-btn:hover {
+    border-color: var(--primary-color);
+}
+
+/* ---- Mobile breakpoint: show hamburger, hide desktop nav links ---- */
 @media (max-width: 768px) {
     h1 {
         font-size: 2.5rem;
     }
 
     header {
-        padding: 1rem 5%;
+        padding: 0.9rem 5%;
+    }
+
+    .nav-links {
+        display: none !important;
+    }
+
+    .hamburger-btn {
+        display: flex;
     }
 
     .btn {
         width: 100%;
     }
+
+    /* ── Testimonial Carousel — Mobile ── */
+    .testimonials {
+        padding: 4rem 4%;   /* was 8rem 10% — too wide on phones */
+    }
+
+    .testimonial-carousel {
+        gap: 0.5rem;        /* tighter gap so buttons don't eat too much room */
+    }
+
+    .chat-screenshot {
+        height: 65vw;       /* fluid height: grows with the screen width */
+        min-height: 240px;  /* never collapse too small */
+        max-height: 420px;  /* cap on large phones/tablets */
+        border-radius: 14px;
+    }
+
+    .tcarousel-btn {
+        width: 36px;        /* smaller arrow buttons on mobile */
+        height: 36px;
+        flex-shrink: 0;
+    }
+
+    .tcarousel-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .tcarousel-dots {
+        margin-top: 1rem;
+        gap: 0.4rem;
+    }
+
+    .tcarousel-dot {
+        width: 6px;
+        height: 6px;
+    }
+}
+
+body.nav-open {
+    overflow: hidden;
 }
 
 /* Custom Modals */

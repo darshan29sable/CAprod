@@ -2,92 +2,32 @@
 // Free Learning Resources
 const FREE_RESOURCES = [
     {
-        "id": 2,
-        "title": "What is UiPath?",
-        "link": "https://drive.google.com/file/d/1J2FYk-9T_pmtrVcJ_M4HHzaxGSMrjpDL/view?usp=drive_link",
-        "desc": "Introduction to the leading RPA platform...."
-    },
-    {
         "id": 1,
-        "title": "Types of Automation",
-        "link": "https://drive.google.com/file/d/1Z0p3fgyrewvt5EcWoV6tf29qCa2b5W2s/view?usp=sharing",
-        "desc": "Understanding attended vs unattended BOTs."
+        "title": "Module 1: Ultimate RPA Basics",
+        "desc": "Master the fundamentals of UiPath, Variables, selectors and control flow.",
+        "link": "module.html?id=1"
     },
     {
-        "id": 3,
-        "title": "Asset",
-        "link": "https://drive.google.com/file/d/1ahtrApEPIsLA_tSVWFN3LhTaLLE7WIao/view?usp=sharing",
-        "desc": "How to manage variables in Orchestrator."
-    },
-    {
-        "id": 4,
-        "title": "Triggers",
-        "link": "https://drive.google.com/file/d/1bMYKpPteVxm1fMoZahdipKkbiUIJhcuu/view?usp=sharing",
-        "desc": "Scheduling and event-based execution."
-    },
-    {
-        "id": 5,
-        "title": "Queues",
-        "link": "https://drive.google.com/file/d/18EgMUvmmSle5y5ON8N6WC2HDGFaE6NfQ/view?usp=sharing",
-        "desc": "Handling transaction-based processing."
-    },
-    {
-        "id": 6,
-        "title": "Process & Jobs",
-        "link": "https://drive.google.com/file/d/1Ut1_TK6n7qNFVFPS4mroGRZqRfPXX8pR/view?usp=sharing",
-        "desc": "Deployment and execution management."
-    },
-    {
-        "id": 7,
-        "title": "Healing Agent",
-        "link": "https://drive.google.com/file/d/1oDmYY_4YcEsXsBBdxGRB-QNkz02nZDhS/view?usp=drive_link",
-        "desc": "Self-healing mechanisms in automation."
-    },
-    {
-        "id": 8,
-        "title": "High Density Robots",
-        "link": "https://drive.google.com/file/d/1LEe79Rr-h0Uh4u9dW0iIsim3jthM3RaB/view?usp=sharing",
-        "desc": "Maximizing server utilization with HD robots."
-    },
-    {
-        "id": 9,
-        "title": "Logging",
-        "link": "https://drive.google.com/file/d/1KmXHZh1m4wuk8LszKnKX8RgYXuE96Yfd/view?usp=sharing",
-        "desc": "Advanced debugging and audit trails."
-    },
-    {
-        "id": 10,
-        "title": "Cloud Robots",
-        "link": "https://drive.google.com/file/d/1McbiAZCq82xVlkiVJnsHzj3JhDyw_u6U/view?usp=sharing",
-        "desc": "Serverless execution in the cloud."
-    },
-    {
-        "id": 23,
-        "title": "Dependencies",
-        "link": "https://drive.google.com/file/d/1_lYu91uqUDIYHzXtoWXXp2ikCy0Fq00L/view?usp=sharing",
-        "desc": "Managing NuGet packages and versions."
+        "id": 2,
+        "title": "Module 2: Advanced UI Automation",
+        "desc": "Deep dive into Excel, PDF, and dynamic UI interactions.",
+        "link": "module.html?id=2"
     }
 ];
 
 // Exclusive Community Resources
 const EXCLUSIVE_RESOURCES = [
     {
-        "id": 22,
-        "title": "RE-Framework",
-        "link": "https://drive.google.com/file/d/1gCFzjseCnuZkik7R2kJYfLWnuHPSG2Ta/view?usp=sharing",
-        "desc": "The gold standard for enterprise automation."
+        "id": 3,
+        "title": "Module 3: REFramework Mastery",
+        "desc": "Build enterprise-grade, scalable, and robust automation projects.",
+        "link": "module.html?id=3"
     },
     {
-        "id": 24,
-        "title": "Excel & Workbook Activities",
-        "link": "https://drive.google.com/file/d/1yUe6N4pK0sOlGtvJby1YZMc3AI8VQs3A/view?usp=sharing",
-        "desc": "High-performance data manipulation."
-    },
-    {
-        "id": 25,
-        "title": "Excel & Workbook Activities",
-        "link": "https://drive.google.com/file/d/1yUe6N4pK0sOlGtvJby1YZMc3AI8VQs3A/view?usp=sharing",
-        "desc": "High-performance data manipulation."
+        "id": 4,
+        "title": "Module 4: AI & Document Understanding",
+        "desc": "Integrate AI Agents, ML models, and intelligent document processing.",
+        "link": "module.html?id=4"
     }
 ];
 
@@ -96,51 +36,19 @@ const ALL_RESOURCES = [...FREE_RESOURCES, ...EXCLUSIVE_RESOURCES.map(r => ({ ...
 
 const youtubeVideos = [
     {
-        "title": "50+ UiPath RPA Interview Questions",
+        "title": "UiPath End to End Project 2026",
         "id": "dQw4w9WgXcQ",
-        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "1.2K",
+        "views": "25K",
         "duration": "45:20",
+        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
         "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
-        "title": "RE-Framework Pro Tips",
-        "id": "dQw4w9WgXcQ",
+        "title": "Mastering AI Agents in UiPath",
+        "id": "abc123xyz",
+        "views": "12K",
+        "duration": "22:15",
         "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "3K",
-        "duration": "12:15",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    },
-    {
-        "title": "Orchestrator Mastery 2026",
-        "id": "dQw4w9WgXcQ",
-        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "800",
-        "duration": "25:00",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    },
-    {
-        "title": "Cloud Robots Walkthrough",
-        "id": "dQw4w9WgXcQ",
-        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "2.5K",
-        "duration": "18:40",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    },
-    {
-        "title": "AI Center Integration",
-        "id": "dQw4w9WgXcQ",
-        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "1.1K",
-        "duration": "22:10",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    },
-    {
-        "title": "Self-Healing Automation",
-        "id": "dQw4w9WgXcQ",
-        "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-        "views": "4K",
-        "duration": "14:55",
         "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     }
 ];
@@ -150,11 +58,6 @@ const testimonials = [
         "type": "image",
         "content": "chat_1.png",
         "author": "Verified Learner"
-    },
-    {
-        "type": "text",
-        "content": "Darshan, I just got hired as a Senior RPA Dev thanks to your Studio module! You are a legend.",
-        "author": "Senior RPA Dev"
     },
     {
         "type": "text",

@@ -25,8 +25,31 @@
                 </button>
                 <div class="auth-container" id="auth-container"></div>
             </div>
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
         </nav>
     </header>
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+    <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Mobile navigation">
+        <a href="index.html" class="drawer-logo">CAPTAIN<span>AUTOMATION</span></a>
+        <button class="drawer-close" id="drawer-close-btn" aria-label="Close menu"><i data-lucide="x"></i></button>
+        <div id="drawer-user-card"></div>
+        <div class="drawer-section-label">Navigation</div>
+        <a href="index.html" class="drawer-link"><i data-lucide="home"></i> Home</a>
+        <a href="about.html" class="drawer-link"><i data-lucide="user"></i> About Me</a>
+        <a href="resources.html" class="drawer-link"><i data-lucide="book-open"></i> Resources</a>
+        <a href="youtube.html" class="drawer-link active"><i data-lucide="youtube"></i> YouTube</a>
+        <a href="mock-test.html" class="drawer-link"><i data-lucide="clipboard-list"></i> Mock Test</a>
+        <div class="drawer-divider"></div>
+        <a href="fam.html" class="drawer-cta"><i data-lucide="users"></i> Join CA Community</a>
+        <div class="drawer-bottom" style="margin-top:auto;">
+            <span>Toggle Theme</span>
+            <button class="drawer-theme-btn" id="drawer-theme-btn" aria-label="Toggle theme"><i data-lucide="moon"></i></button>
+        </div>
+    </nav>
 
     <main>
         <section class="page-header" id="global-page-header">
@@ -45,5 +68,6 @@
     <script src="config.js"></script>
     <script src="content.js"></script>
     <script src="main.js"></script>
+    <script>(function(){function rdu(){if(typeof window.drawerRenderUser==='function')window.drawerRenderUser();}function init(){var btn=document.getElementById('hamburger-btn'),drawer=document.getElementById('mobile-nav-drawer'),overlay=document.getElementById('mobile-nav-overlay'),closeBtn=document.getElementById('drawer-close-btn'),dTheme=document.getElementById('drawer-theme-btn');if(!btn||!drawer||!overlay)return;function open(){drawer.classList.add('open');overlay.classList.add('open');btn.classList.add('open');btn.setAttribute('aria-expanded','true');document.body.classList.add('nav-open');rdu();if(typeof lucide!=='undefined')lucide.createIcons();}function close(){drawer.classList.remove('open');overlay.classList.remove('open');btn.classList.remove('open');btn.setAttribute('aria-expanded','false');document.body.classList.remove('nav-open');}btn.addEventListener('click',()=>drawer.classList.contains('open')?close():open());overlay.addEventListener('click',close);if(closeBtn)closeBtn.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});if(dTheme)dTheme.addEventListener('click',()=>{var t=document.getElementById('theme-toggle');if(t)t.click();var theme=document.documentElement.getAttribute('data-theme');var i=dTheme.querySelector('i');if(i)i.setAttribute('data-lucide',theme==='dark'?'sun':'moon');if(typeof lucide!=='undefined')lucide.createIcons();});}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();})();</script>
 </body>
 </html>

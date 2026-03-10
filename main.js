@@ -162,7 +162,7 @@ function renderContent() {
         });
     }
 
-    // 3. Render Testimonials (if on index.html)
+    // 3. Render Testimonials (if on index.html) + init carousel
     const testimonialContainer = document.getElementById('testimonial-container');
     if (testimonialContainer && typeof testimonials !== 'undefined') {
         testimonials.forEach(t => {
@@ -181,6 +181,51 @@ function renderContent() {
             }
             testimonialContainer.appendChild(wrap);
         });
+
+        // ── Carousel Logic ────────────────────────────────────────
+        const track    = testimonialContainer;         // the .testimonial-track
+        const prevBtn  = document.getElementById('tcarousel-prev');
+        const nextBtn  = document.getElementById('tcarousel-next');
+        const dotsWrap = document.getElementById('tcarousel-dots');
+        const total    = testimonials.length;
+        let current    = 0;
+
+        // Build dots
+        if (dotsWrap) {
+            testimonials.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'tcarousel-dot' + (i === 0 ? ' active' : '');
+                dot.setAttribute('aria-label', `Go to testimonial ${i + 1}`);
+                dot.addEventListener('click', () => goTo(i));
+                dotsWrap.appendChild(dot);
+            });
+        }
+
+        function updateCarousel() {
+            // Shift track
+            track.style.transform = `translateX(-${current * 100}%)`;
+
+            // Update dots
+            if (dotsWrap) {
+                dotsWrap.querySelectorAll('.tcarousel-dot').forEach((d, i) => {
+                    d.classList.toggle('active', i === current);
+                });
+            }
+
+            // Button disabled states
+            if (prevBtn) prevBtn.disabled = current === 0;
+            if (nextBtn) nextBtn.disabled = current === total - 1;
+        }
+
+        function goTo(index) {
+            current = Math.max(0, Math.min(index, total - 1));
+            updateCarousel();
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
+        if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
+
+        updateCarousel(); // set initial state (disable prev on first load)
     }
 
     lucide.createIcons();
@@ -635,3 +680,69 @@ function showForgotPasswordModal() {
         }
     });
 }
+
+// ── Shared Drawer User Card Renderer ─────────────────────────────────────────
+// Called by every page's hamburger script each time the drawer opens.
+// Renders: logged-in card (avatar + name + points + action buttons)
+//       or guest login prompt.
+window.drawerRenderUser = function() {
+    const card = document.getElementById('drawer-user-card');
+    if (!card) return;
+
+    const user     = sessionStorage.getItem('vault_user');
+    const unlocked = sessionStorage.getItem('vault_unlocked');
+    const role     = sessionStorage.getItem('vault_role') || 'user';
+
+    if (user && unlocked) {
+        const pts     = (typeof window.getTotalPoints === 'function') ? window.getTotalPoints(user) : 0;
+        const initials = user.slice(0, 2).toUpperCase();
+
+        // Inline SVG icons (no lucide dependency needed here)
+        const iShield = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+        const iKey    = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="4.5"/><path d="m21 21-9.2-9.2"/><path d="m16 10.5-7 7"/><path d="m13 11 2.5 2.5"/></svg>`;
+        const iLogout = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`;
+
+        let actionsHtml = '';
+        if (role === 'admin') {
+            actionsHtml += `<button class="drawer-action-btn drawer-action-admin" id="drwr-admin-btn">${iShield} Admin Panel</button>`;
+        }
+        actionsHtml += `<button class="drawer-action-btn" id="drwr-pass-btn">${iKey} Change Password</button>`;
+        actionsHtml += `<button class="drawer-action-btn drawer-action-logout" id="drwr-logout-btn">${iLogout} Logout</button>`;
+
+        card.innerHTML = `
+            <div class="drawer-user-card">
+                <div class="drawer-avatar">${initials}</div>
+                <div class="drawer-user-info">
+                    <div class="drawer-user-name">${user}</div>
+                    <div class="drawer-user-pts">&#9733; ${pts} Points</div>
+                </div>
+            </div>
+            <div class="drawer-user-actions">${actionsHtml}</div>`;
+
+        // Wire up buttons
+        const passBtn   = document.getElementById('drwr-pass-btn');
+        const adminBtn  = document.getElementById('drwr-admin-btn');
+        const logoutBtn = document.getElementById('drwr-logout-btn');
+
+        if (passBtn)   passBtn.addEventListener('click',   () => showChangePasswordModal());
+        if (adminBtn)  adminBtn.addEventListener('click',  () => window.location.href = 'admin.html');
+        if (logoutBtn) logoutBtn.addEventListener('click', () => {
+            ['vault_user','vault_pass','vault_role','vault_unlocked'].forEach(k => sessionStorage.removeItem(k));
+            window.location.reload();
+        });
+
+    } else {
+        // Guest state — show login prompt
+        card.innerHTML = `
+            <a href="login.html" class="drawer-guest-card">
+                <div class="drawer-guest-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <span>Login to your account</span>
+            </a>`;
+    }
+};
+
