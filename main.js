@@ -162,6 +162,27 @@ function renderContent() {
         });
     }
 
+    // 3. Render Testimonials (if on index.html)
+    const testimonialContainer = document.getElementById('testimonial-container');
+    if (testimonialContainer && typeof testimonials !== 'undefined') {
+        testimonials.forEach(t => {
+            const wrap = document.createElement('div');
+            wrap.className = 'chat-screenshot';
+            if (t.type === 'image') {
+                wrap.innerHTML = `<img src="${t.content}" alt="Learner Feedback">`;
+            } else {
+                wrap.innerHTML = `
+                    <div class="placeholder-chat">
+                        <i data-lucide="message-square" size="48"></i>
+                        <p>"${t.content}"</p>
+                        <span>- ${t.author || 'Verified Learner'}</span>
+                    </div>
+                `;
+            }
+            testimonialContainer.appendChild(wrap);
+        });
+    }
+
     lucide.createIcons();
 }
 

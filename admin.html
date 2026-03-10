@@ -38,6 +38,7 @@
                 <button class="tab-btn" data-tab="free"><i data-lucide="book-open"></i> Free Resources</button>
                 <button class="tab-btn" data-tab="exclusive"><i data-lucide="shield-check"></i> Exclusive</button>
                 <button class="tab-btn" data-tab="youtube"><i data-lucide="youtube"></i> YouTube</button>
+                <button class="tab-btn" data-tab="testimonials"><i data-lucide="message-square"></i> Testimonials</button>
             </div>
             <button id="header-collapse-btn" class="collapse-trigger" title="Toggle Compact View">
                 <i data-lucide="chevron-up"></i>
@@ -208,6 +209,32 @@
                     <input type="text" id="yt-url">
                 </div>
                 <button id="save-yt-btn" class="modal-submit-btn">Save Video <i data-lucide="save"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonial Modal -->
+    <div id="testimonial-modal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <button class="modal-close"><i data-lucide="x"></i></button>
+            <h3>Manage <span class="highlight">Testimonial</span></h3>
+            <div class="modal-form">
+                <div class="input-group">
+                    <label>Type</label>
+                    <select id="testi-type">
+                        <option value="text">Text Quote</option>
+                        <option value="image">Screenshot Image</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Author Label</label>
+                    <input type="text" id="testi-author">
+                </div>
+                <div class="input-group">
+                    <label>Content (Text Quote or Image Filename)</label>
+                    <textarea id="testi-content" rows="3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 12px; color: var(--text-color); width: 100%; font-family: inherit; resize: none;"></textarea>
+                </div>
+                <button id="save-testi-btn" class="modal-submit-btn">Save Testimonial <i data-lucide="save"></i></button>
             </div>
         </div>
     </div>
@@ -482,6 +509,19 @@
             attachYoutubeEvents();
         }
 
+        function renderTestimonials() {
+            const body = document.getElementById('testimonials-body'); body.innerHTML = '';
+            fullContent.testimonials.forEach((t, i) => {
+                const tr = document.createElement('tr');
+                const snippet = t.content.length > 50 ? t.content.substring(0, 50) + '...' : t.content;
+                tr.innerHTML = `<td><span class="badge" style="margin:0">${t.type}</span></td><td><strong>${t.author || 'N/A'}</strong></td><td style="color:var(--text-muted); font-size:0.8rem;">${snippet}</td>
+                    <td><button class="btn-small edit-testi" data-idx="${i}"><i data-lucide="edit-3"></i></button>
+                    <button class="btn-small del-testi" data-idx="${i}" style="background:var(--accent-red); color:white !important; margin-left:5px;"><i data-lucide="trash-2"></i></button></td>`;
+                body.appendChild(tr);
+            });
+            attachTestimonialEvents();
+        }
+
         // Modals
         function openM(id) {
             const m = document.getElementById(id); m.style.opacity = '1'; m.style.pointerEvents = 'auto';
@@ -596,6 +636,16 @@
             closeM('youtube-modal');
         };
 
+        document.getElementById('save-testi-btn').onclick = () => {
+            const v = editingIndex === -1 ? {} : fullContent.testimonials[editingIndex];
+            v.type = document.getElementById('testi-type').value;
+            v.author = document.getElementById('testi-author').value;
+            v.content = document.getElementById('testi-content').value;
+            if(editingIndex === -1) fullContent.testimonials.push(v);
+            saveContent(editingIndex === -1 ? "Testimonial Added" : "Testimonial Updated"); 
+            closeM('testimonial-modal');
+        };
+
         // Save
         async function saveConfig(msg) {
             try {
@@ -639,6 +689,13 @@
             document.getElementById('yt-thumb').value = 'https://img.youtube.com/vi/ID/maxresdefault.jpg';
             document.getElementById('yt-url').value = 'https://www.youtube.com/watch?v=';
             openM('youtube-modal');
+        };
+        document.getElementById('add-testimonial-btn').onclick = () => {
+            editingIndex = -1;
+            document.getElementById('testi-type').value = 'text';
+            document.getElementById('testi-author').value = '';
+            document.getElementById('testi-content').value = '';
+            openM('testimonial-modal');
         };
 
         document.querySelectorAll('.refresh-config-btn').forEach(b => b.onclick = fetchAll);

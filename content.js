@@ -144,3 +144,21 @@ const youtubeVideos = [
         "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     }
 ];
+
+const testimonials = [
+    {
+        "type": "image",
+        "content": "chat_1.png",
+        "author": "Verified Learner"
+    },
+    {
+        "type": "text",
+        "content": "Darshan, I just got hired as a Senior RPA Dev thanks to your Studio module! You are a legend.",
+        "author": "Senior RPA Dev"
+    },
+    {
+        "type": "text",
+        "content": "Darshan, I just got hired as a Senior RPA Dev thanks to your Studio module! You are a legend.",
+        "author": "Senior RPA Dev"
+    }
+];

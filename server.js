@@ -280,9 +280,10 @@ function getFullContent(){
     const FREE_RESOURCES = getJsVar(CONTENT_PATH, 'FREE_RESOURCES');
     const EXCLUSIVE_RESOURCES = getJsVar(CONTENT_PATH, 'EXCLUSIVE_RESOURCES');
     const youtubeVideos = getJsVar(CONTENT_PATH, 'youtubeVideos');
+    const testimonials = getJsVar(CONTENT_PATH, 'testimonials');
 
-    if (FREE_RESOURCES && EXCLUSIVE_RESOURCES && youtubeVideos) {
-        return { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos };
+    if (FREE_RESOURCES && EXCLUSIVE_RESOURCES && youtubeVideos && testimonials) {
+        return { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos, testimonials };
     }
     return null;
 }
@@ -301,7 +302,7 @@ app.get('/api/admin/content',adminCheck,(req,res)=>{
 
 app.post('/api/admin/save-content', adminCheck, (req, res) => {
     try {
-        const { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos } = req.body;
+        const { FREE_RESOURCES, EXCLUSIVE_RESOURCES, youtubeVideos, testimonials } = req.body;
         
         let contentStr = `
 // Free Learning Resources
@@ -314,6 +315,8 @@ const EXCLUSIVE_RESOURCES = ${JSON.stringify(EXCLUSIVE_RESOURCES, null, 4)};
 const ALL_RESOURCES = [...FREE_RESOURCES, ...EXCLUSIVE_RESOURCES.map(r => ({ ...r, exclusive: true }))];
 
 const youtubeVideos = ${JSON.stringify(youtubeVideos, null, 4)};
+
+const testimonials = ${JSON.stringify(testimonials, null, 4)};
 `;
         fs.writeFileSync(CONTENT_PATH, contentStr, 'utf8');
         res.json({ success: true });
